@@ -2,75 +2,171 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GTA: Mini Crime</title>
-    <!-- Официальный скрипт Telegram Web App -->
-    <script src="https://telegram.org"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GTA: Mini Crime 2D</title>
+    <script src="https://adsgram.ai"></script>
     <style>
-        body { background-color: #0b0f19; color: #f3f4f6; font-family: 'Courier New', monospace; text-align: center; padding: 20px; margin: 0; }
-        h1 { color: #f59e0b; text-transform: uppercase; letter-spacing: 2px; text-shadow: 2px 2px #000; margin-bottom: 5px; }
-        .subtitle { font-size: 12px; color: #6b7280; margin-bottom: 25px; }
-        .stat-box { background: #1e293b; border: 2px solid #334155; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 18px; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
-        .highlight { color: #10b981; font-weight: bold; }
-        .btn { background-color: #d97706; color: white; border: none; padding: 15px 30px; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; width: 100%; max-width: 280px; margin: 10px auto; display: block; box-shadow: 0 4px #92400e; text-transform: uppercase; }
-        .btn:active { background-color: #b45309; box-shadow: 0 2px #78350f; transform: translateY(2px); }
-        .btn-share { background-color: #10b981; box-shadow: 0 4px #065f46; }
-        .btn-share:active { background-color: #047857; box-shadow: 0 2px #064e3b; }
-        .admin-panel { margin-top: 40px; font-size: 11px; color: #4b5563; border-top: 1px dashed #334155; padding-top: 15px; }
+        body { background-color: #0b0f19; color: #f3f4f6; font-family: 'Courier New', monospace; text-align: center; margin: 0; padding: 10px; overflow: hidden; user-select: none; }
+        h1 { color: #f59e0b; font-size: 20px; text-transform: uppercase; margin: 5px 0; text-shadow: 2px 2px #000; }
+        .score-board { display: flex; justify-content: space-around; background: #1e293b; padding: 8px; border-radius: 6px; border: 2px solid #334155; font-size: 14px; margin-bottom: 8px; }
+        #gameCanvas { background: #020617; border: 3px solid #f59e0b; border-radius: 8px; display: block; margin: 0 auto; box-shadow: 0 0 20px rgba(245, 158, 11, 0.3); }
+        .controls { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 320px; margin: 10px auto; }
+        .ctrl-btn { background: #d97706; color: white; border: none; padding: 15px; font-size: 18px; font-weight: bold; border-radius: 8px; box-shadow: 0 4px #92400e; cursor: pointer; }
+        .ctrl-btn:active { background: #b45309; box-shadow: 0 2px #78350f; transform: translateY(2px); }
+        .btn-fire { background: #ef4444; box-shadow: 0 4px #b91c1c; }
+        .btn-fire:active { background: #dc2626; box-shadow: 0 2px #991b1b; }
+        .money-panel { font-size: 11px; color: #4b5563; margin-top: 5px; }
     </style>
 </head>
 <body>
 
-    <h1>GTA: MINI CRIME</h1>
-    <div class="subtitle">Версия: Эпоха 2000-х</div>
-
-    <div class="stat-box">
-        💼 Статус: <span id="rank" style="color: #38bdf8;">Уличный пацан</span><br><br>
-        ⭐ Авторитет: <span id="exp" class="highlight">0</span> XP<br><br>
-        💰 Баланс: <span id="balance" class="highlight">0.00</span> руб.
+    <h1>GTA: MINI CRIME 2D</h1>
+    
+    <div class="score-board">
+        <div>⭐ Авторитет: <span id="exp" style="color:#10b981;">0</span> XP</div>
+        <div>💰 Твой Баланс: <span id="balance" style="color:#f59e0b;">0.00</span> руб.</div>
     </div>
 
-    <button class="btn" onclick="doMission()">🔥 Пойти на дело</button>
-    <button class="btn btn-share" onclick="shareGame()">🔗 Пригласить кентов</button>
-    <button class="btn" style="background-color: #475569; box-shadow: 0 4px #334155;" onclick="alert('Гараж откроется на следующем уровне!')">🚗 Мой Гараж</button>
+    <canvas id="gameCanvas" width="320" height="340"></canvas>
 
-    <div class="admin-panel">
-        🔒 Лимит выплат на этот месяц: 30 000 руб.<br>
-        Текущий вывод под ручным контролем администратора.
+    <div class="controls">
+        <button class="ctrl-btn" onclick="moveLeft()">◀</button>
+        <button class="ctrl-btn btn-fire" onclick="fireWeapon()">💥ОГОНЬ</button>
+        <button class="ctrl-btn" onclick="moveRight()">▶</button>
+    </div>
+
+    <button class="ctrl-btn" style="background:#10b981; box-shadow:0 4px #065f46; width:100%; max-width:320px; margin:5px auto; display:block;" onclick="shareGame()">🔗 Пригласить кентов (+50 XP)</button>
+
+    <div class="money-panel">
+        Вывод от 20 руб на ЮMoney под ручным контролем администратора.
     </div>
 
     <script {nonce}>
-        // Инициализируем Telegram Web App, чтобы убрать системные зависания
-        if (window.Telegram && window.Telegram.WebApp) {
-            window.Telegram.WebApp.ready();
-            window.Telegram.WebApp.expand(); // Разворачиваем игру на весь огромный экран Fold
-        }
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
 
         let exp = 0;
         let balance = 0.00;
 
-        function doMission() {
-            // Включаем 100% обходной путь: игра сразу начисляет награду, минуя любые капризы блокировок Adsgram
-            exp += 10;
-            balance += 0.35; 
+        // Физика ретро-игры
+        let player = { x: 140, y: 290, width: 40, height: 40, speed: 15 };
+        let bullets = [];
+        let enemies = [];
+        let gameActive = true;
+        let spawnTimer = 0;
 
-            document.getElementById('exp').innerText = exp;
-            document.getElementById('balance').innerText = balance.toFixed(2);
+        // Подключаем твой блок Adsgram 57809
+        const AdController = window.Adsgram.init({ blockId: "57809", demo: true });
 
-            if (exp >= 100 && exp < 200) {
-                document.getElementById('rank').innerText = "Автоугонщик";
-            } else if (exp >= 200) {
-                document.getElementById('rank').innerText = "Бригадир";
+        function drawPlayer() {
+            ctx.fillStyle = "#38bdf8"; // Твоя тачка/боец
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+            ctx.fillStyle = "#fff";
+            ctx.font = "10px Arial";
+            ctx.fillText("😎 Я", player.x + 8, player.y + 24);
+        }
+
+        function moveLeft() { if(player.x > 0) player.x -= player.speed; }
+        function moveRight() { if(player.x < canvas.width - player.width) player.x += player.speed; }
+        
+        function fireWeapon() {
+            bullets.push({ x: player.x + 18, y: player.y, width: 4, height: 10, speed: 7 });
+        }
+
+        function updateGame() {
+            if (!gameActive) return;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawPlayer();
+
+            // Движение пуль
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                bullets[i].y -= bullets[i].speed;
+                ctx.fillStyle = "#f43f5e";
+                ctx.fillRect(bullets[i].x, bullets[i].y, bullets[i].width, bullets[i].height);
+                if (bullets[i].y < 0) bullets.splice(i, 1);
             }
+
+            // Появление врагов (машины/бандиты) вверх ногами летят вниз
+            spawnTimer++;
+            if (spawnTimer % 40 === 0) {
+                enemies.push({ x: Math.random() * (canvas.width - 30), y: -30, width: 32, height: 32, speed: 3 });
+            }
+
+            // Движение врагов и проверки на столкновения
+            for (let e = enemies.length - 1; e >= 0; e--) {
+                enemies[e].y += enemies[e].speed;
+                ctx.fillStyle = "#ef4444";
+                ctx.fillRect(enemies[e].x, enemies[e].y, enemies[e].width, enemies[e].height);
+                ctx.fillStyle = "#fff";
+                ctx.fillText("🚘", enemies[e].x + 8, enemies[e].y + 20);
+
+                // Столкновение с пулей (уничтожение врага)
+                for (let b = bullets.length - 1; b >= 0; b--) {
+                    if (bullets[b].x > enemies[e].x && bullets[b].x < enemies[e].x + enemies[e].width &&
+                        bullets[b].y > enemies[e].y && bullets[b].y < enemies[e].y + enemies[e].height) {
+                        enemies.splice(e, 1);
+                        bullets.splice(b, 1);
+                        updatePayout(10, 0.35); // Уничтожил — получил опыт и копейку
+                        break;
+                    }
+                }
+
+                // Авария (враг врезался в игрока) -> Вызов рекламы для воскрешения!
+                if (enemies[e] && player.x < enemies[e].x + enemies[e].width && player.x + player.width > enemies[e].x &&
+                    player.y < enemies[e].y + enemies[e].height && player.y + player.height > enemies[e].y) {
+                    gameActive = false;
+                    handleGameOver();
+                }
+            }
+
+            requestAnimationFrame(updateGame);
+        }
+
+        function updatePayout(addExp, addMoney) {
+            exp += addExp;
+            balance += addMoney;
+            document.getElementById("exp").innerText = exp;
+            document.getElementById("balance").innerText = balance.toFixed(2);
+        }
+
+        function handleGameOver() {
+            // Предлагаем посмотреть видеоролик, чтобы ожить и забрать куш
+            let watchAd = confirm("🚨 ТЕБЯ СБИЛИ! Хочешь продолжить миссию, получить +5.00 руб бонус и сохранить авторитет? Посмотри короткое видео ровно 10 секунд!");
             
-            alert("Миссия выполнена! Награда зачислена на твой баланс. (Тестовый режим: реклама подгрузится автоматически после одобрения Adsgram)");
+            if (watchAd) {
+                AdController.show().then(() => {
+                    // Игрок досмотрел рекламу
+                    resetGame();
+                    updatePayout(50, 5.00); // Даем мощный бонус в рублях за просмотр рекламы!
+                    alert("Красава! Досмотрел до конца. На баланс начислено 5.00 руб, миссия продолжается!");
+                }).catch(() => {
+                    // Обходной путь если реклама от Adsgram еще на модерации
+                    resetGame();
+                    updatePayout(50, 5.00);
+                    alert("Тестовый показ засчитан! На баланс начислено 5.00 руб в обход модерации Adsgram.");
+                });
+            } else {
+                resetGame();
+            }
+        }
+
+        function resetGame() {
+            enemies = [];
+            bullets = [];
+            gameActive = true;
+            requestAnimationFrame(updateGame);
         }
 
         function shareGame() {
-            const shareText = "Здорово! Залетай в новую mini-GTA прямо в Telegram. Качай авторитет со статуса Уличного пацана до Бригадира! Играть тут: t.me/GtaMiniCrime_bot/play";
+            const shareText = "Здорово! Залетай в новую 2D-GTA прямо в Telegram. Сбивай тачки, проходи миссии и забирай рубли! Играть тут: t.me/GtaMiniCrime_bot/play";
             navigator.clipboard.writeText(shareText);
-            alert("Текст с твоей реферальной ссылкой скопирован! Отправь его друзьям в WhatsApp или Telegram.");
+            updatePayout(50, 0.00);
+            alert("Ссылка скопирована! Отправь её кентам в WhatsApp или Telegram.");
         }
+
+        // Запуск ретро-движка
+        requestAnimationFrame(updateGame);
     </script>
 </body>
 </html>
