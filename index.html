@@ -14,6 +14,8 @@
         .highlight { color: #10b981; font-weight: bold; }
         .btn { background-color: #d97706; color: white; border: none; padding: 15px 30px; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; width: 100%; max-width: 280px; margin: 10px auto; display: block; box-shadow: 0 4px #92400e; text-transform: uppercase; }
         .btn:active { background-color: #b45309; box-shadow: 0 2px #78350f; transform: translateY(2px); }
+        .btn-share { background-color: #10b981; box-shadow: 0 4px #065f46; }
+        .btn-share:active { background-color: #047857; box-shadow: 0 2px #064e3b; }
         .admin-panel { margin-top: 40px; font-size: 11px; color: #4b5563; border-top: 1px dashed #334155; padding-top: 15px; }
     </style>
 </head>
@@ -29,7 +31,8 @@
     </div>
 
     <button class="btn" onclick="showAdAndPay()">🔥 Пойти на дело</button>
-    <button class="btn" style="background-color: #475569; box-shadow: 0 4px #334155;" onclick="alert('Гараж откроется на следующем цене!')">🚗 Мой Гараж</button>
+    <button class="btn btn-share" onclick="shareGame()">🔗 Пригласить кентов</button>
+    <button class="btn" style="background-color: #475569; box-shadow: 0 4px #334155;" onclick="alert('Гараж откроется на следующем уровне!')">🚗 Мой Гараж</button>
 
     <div class="admin-panel">
         🔒 Лимит выплат на этот месяц: 30 000 руб.<br>
@@ -44,9 +47,7 @@
         const AdController = window.Adsgram.init({ blockId: "54681" });
 
         function showAdAndPay() {
-            // Запускаем показ видео-рекламы
             AdController.show().then((result) => {
-                // Игрок успешно досмотрел рекламу — начисляем награду
                 exp += 10;
                 balance += 0.35; 
 
@@ -60,9 +61,30 @@
                 }
                 alert("Миссия выполнена! Награда зачислена. Деньги отправлены на ваш внутренний счет.");
             }).catch((result) => {
-                // Если игрок скипнул рекламу или произошла ошибка
                 alert("Чтобы выполнить миссию, необходимо досмотреть видео до конца!");
             });
+        }
+
+        function shareGame() {
+            // Функция вызывает стандартное окно "Поделиться" на телефоне игрока
+            const shareText = "Здорово! Залетай в новую мини-GTA прямо в Telegram. Качай авторитет со статуса Уличного пацана до Бригадира! Играть тут: t.me/GtaMiniCrime_bot/play";
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'GTA: Mini Crime',
+                    text: shareText,
+                    url: 'https://t.me'
+                }).then(() => {
+                    // Бонус игроку за то, что поделился
+                    exp += 50;
+                    document.getElementById('exp').innerText = exp;
+                    alert("Красава! Ссылка отправлена кентам. Тебе начислено +50 к Авторитету!");
+                }).catch(console.error);
+            } else {
+                // Если браузер старый, просто копируем в буфер обмена
+                navigator.clipboard.writeText(shareText);
+                alert("Текст с твоей ссылкой скопирован! Отправь его друзьям в WhatsApp или Telegram.");
+            }
         }
     </script>
 </body>
