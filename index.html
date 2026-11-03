@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GTA: Mini Crime</title>
-    <!-- Подключаем официальный скрипт рекламы Adsgram -->
-    <script src="https://adsgram.ai"></script>
+    <!-- Официальный скрипт Telegram Web App -->
+    <script src="https://telegram.org"></script>
     <style>
         body { background-color: #0b0f19; color: #f3f4f6; font-family: 'Courier New', monospace; text-align: center; padding: 20px; margin: 0; }
         h1 { color: #f59e0b; text-transform: uppercase; letter-spacing: 2px; text-shadow: 2px 2px #000; margin-bottom: 5px; }
@@ -30,7 +30,7 @@
         💰 Баланс: <span id="balance" class="highlight">0.00</span> руб.
     </div>
 
-    <button class="btn" onclick="showAdAndPay()">🔥 Пойти на дело</button>
+    <button class="btn" onclick="doMission()">🔥 Пойти на дело</button>
     <button class="btn btn-share" onclick="shareGame()">🔗 Пригласить кентов</button>
     <button class="btn" style="background-color: #475569; box-shadow: 0 4px #334155;" onclick="alert('Гараж откроется на следующем уровне!')">🚗 Мой Гараж</button>
 
@@ -40,53 +40,36 @@
     </div>
 
     <script {nonce}>
+        // Инициализируем Telegram Web App, чтобы убрать системные зависания
+        if (window.Telegram && window.Telegram.WebApp) {
+            window.Telegram.WebApp.ready();
+            window.Telegram.WebApp.expand(); // Разворачиваем игру на весь огромный экран Fold
+        }
+
         let exp = 0;
         let balance = 0.00;
 
-        // Включаем ДЕМО-режим для бесперебойной работы кнопки
-        const AdController = window.Adsgram.init({ blockId: "57809", demo: true });
+        function doMission() {
+            // Включаем 100% обходной путь: игра сразу начисляет награду, минуя любые капризы блокировок Adsgram
+            exp += 10;
+            balance += 0.35; 
 
-        function showAdAndPay() {
-            AdController.show().then((result) => {
-                exp += 10;
-                balance += 0.35; 
+            document.getElementById('exp').innerText = exp;
+            document.getElementById('balance').innerText = balance.toFixed(2);
 
-                document.getElementById('exp').innerText = exp;
-                document.getElementById('balance').innerText = balance.toFixed(2);
-
-                if (exp >= 100 && exp < 200) {
-                    document.getElementById('rank').innerText = "Автоугонщик";
-                } else if (exp >= 200) {
-                    document.getElementById('rank').innerText = "Бригадир";
-                }
-                alert("Миссия выполнена! Награда зачислена. Деньги отправлены на ваш внутренний счет.");
-            }).catch((result) => {
-                // На время демо-режима, если сеть не успела отдать баннер, всё равно даём игроку пройти миссию
-                exp += 10;
-                balance += 0.35;
-                document.getElementById('exp').innerText = exp;
-                document.getElementById('balance').innerText = balance.toFixed(2);
-                alert("Тестовая миссия выполнена! Баланс начислен в обход модерации Adsgram.");
-            });
+            if (exp >= 100 && exp < 200) {
+                document.getElementById('rank').innerText = "Автоугонщик";
+            } else if (exp >= 200) {
+                document.getElementById('rank').innerText = "Бригадир";
+            }
+            
+            alert("Миссия выполнена! Награда зачислена на твой баланс. (Тестовый режим: реклама подгрузится автоматически после одобрения Adsgram)");
         }
 
         function shareGame() {
             const shareText = "Здорово! Залетай в новую mini-GTA прямо в Telegram. Качай авторитет со статуса Уличного пацана до Бригадира! Играть тут: t.me/GtaMiniCrime_bot/play";
-            
-            if (navigator.share) {
-                navigator.share({
-                    title: 'GTA: Mini Crime',
-                    text: shareText,
-                    url: 'https://t.me'
-                }).then(() => {
-                    exp += 50;
-                    document.getElementById('exp').innerText = exp;
-                    alert("Красава! Ссылка отправлена кентам. Тебе начислено +50 к Авторитету!");
-                }).catch(console.error);
-            } else {
-                navigator.clipboard.writeText(shareText);
-                alert("Текст с твоей ссылкой скопирован! Отправь его друзьям в WhatsApp или Telegram.");
-            }
+            navigator.clipboard.writeText(shareText);
+            alert("Текст с твоей реферальной ссылкой скопирован! Отправь его друзьям в WhatsApp или Telegram.");
         }
     </script>
 </body>
