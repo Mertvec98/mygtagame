@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GTA: Mini Crime</title>
+    <!-- Подключаем официальный скрипт рекламы Adsgram -->
+    <script src="https://adsgram.ai"></script>
     <style>
         body { background-color: #0b0f19; color: #f3f4f6; font-family: 'Courier New', monospace; text-align: center; padding: 20px; margin: 0; }
         h1 { color: #f59e0b; text-transform: uppercase; letter-spacing: 2px; text-shadow: 2px 2px #000; margin-bottom: 5px; }
@@ -26,8 +28,8 @@
         💰 Баланс: <span id="balance" class="highlight">0.00</span> руб.
     </div>
 
-    <button class="btn" onclick="doMission()">🔥 Пойти на дело</button>
-    <button class="btn" style="background-color: #475569; box-shadow: 0 4px #334155;" onclick="alert('Гараж откроется на следующем уровне!')">🚗 Мой Гараж</button>
+    <button class="btn" onclick="showAdAndPay()">🔥 Пойти на дело</button>
+    <button class="btn" style="background-color: #475569; box-shadow: 0 4px #334155;" onclick="alert('Гараж откроется на следующем цене!')">🚗 Мой Гараж</button>
 
     <div class="admin-panel">
         🔒 Лимит выплат на этот месяц: 30 000 руб.<br>
@@ -38,20 +40,29 @@
         let exp = 0;
         let balance = 0.00;
 
-        function doMission() {
-            exp += 10;
-            balance += 0.35; 
+        // Настройка рекламного блока Adsgram
+        const AdController = window.Adsgram.init({ blockId: "54681" });
 
-            document.getElementById('exp').innerText = exp;
-            document.getElementById('balance').innerText = balance.toFixed(2);
+        function showAdAndPay() {
+            // Запускаем показ видео-рекламы
+            AdController.show().then((result) => {
+                // Игрок успешно досмотрел рекламу — начисляем награду
+                exp += 10;
+                balance += 0.35; 
 
-            if (exp >= 100 && exp < 200) {
-                document.getElementById('rank').innerText = "Автоугонщик";
-            } else if (exp >= 200) {
-                document.getElementById('rank').innerText = "Бригадир";
-            }
+                document.getElementById('exp').innerText = exp;
+                document.getElementById('balance').innerText = balance.toFixed(2);
 
-            alert("Миссия выполнена! Угнана старая тачка. Получено +10 XP и +0.35 руб. на баланс (симуляция рекламы).");
+                if (exp >= 100 && exp < 200) {
+                    document.getElementById('rank').innerText = "Автоугонщик";
+                } else if (exp >= 200) {
+                    document.getElementById('rank').innerText = "Бригадир";
+                }
+                alert("Миссия выполнена! Награда зачислена. Деньги отправлены на ваш внутренний счет.");
+            }).catch((result) => {
+                // Если игрок скипнул рекламу или произошла ошибка
+                alert("Чтобы выполнить миссию, необходимо досмотреть видео до конца!");
+            });
         }
     </script>
 </body>
